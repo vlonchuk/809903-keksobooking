@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Лончук Вячеслав](https://up.htmlacademy.ru/javascript/15/user/809903).
-* Наставник: `Неизвестно`.
+* Наставник: [Никита Пиковец](https://up.htmlacademy.ru/javascript/15/user/503133).
 
 ---
 
