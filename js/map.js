@@ -11,8 +11,8 @@ var MAX_ROOM_COUNT = 5;
 var MIN_GUEST = 2;
 var MAX_GUEST = 10;
 
-var Y_START = 130;
-var Y_END = 630;
+var Y_START = 250;
+var Y_END = 600;
 var PHOTO_ALT_DEF = 'Фотография жилья';
 
 var CHECK_INOUT = [
@@ -145,8 +145,8 @@ var removeClass = function (selector, className) {
 };
 
 var addPin = function (accommodation, el) {
-  el.style.left = accommodation.location.x - (50 / 2) + 'px';
-  el.style.top = accommodation.location.y + 70 + 'px';
+  el.style.left = accommodation.location.x + 'px';
+  el.style.top = accommodation.location.y + 'px';
   var img = el.querySelector('img');
   if (img) {
     img.src = accommodation.author.avatar;
@@ -171,7 +171,6 @@ var addCard = function (accommodation, el) {
   addText(el, '.popup__type', accommodation.offer.type);
   addText(el, '.popup__text--capacity', accommodation.offer.rooms + ' комнат' + (accommodation.offer.rooms === 1 ? 'а' : 'ы') + ' для ' + accommodation.offer.guests + ' гостей');
   addText(el, '.popup__text--time', 'Заезд после ' + accommodation.offer.checkin + ', выезд до ' + accommodation.offer.checkout);
-  // addText(el, '.popup__features', accommodation.offer.features);
   addText(el, '.popup__description', accommodation.offer.description);
 
   var elFeatures = el.querySelector('.popup__features');
@@ -203,7 +202,6 @@ var addCard = function (accommodation, el) {
 };
 
 var accommodations = generateData();
-// console.log(accommodations);
 removeClass('.map', 'map--faded');
 
 // Добавляем метки
@@ -214,6 +212,13 @@ accommodations.forEach(function (accommodation) {
   fragmentPins.appendChild(addPin(accommodation, elOrgPin.cloneNode(true)));
 });
 addElement(fragmentPins, '.map__pins');
+
+// Корректируем положение меток относительно их размеров
+var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+pins.forEach(function (pin) {
+  pin.left -= (pin.clientWidth / 2) + 'px';
+  pin.top += pin.top + pin.clientHeight + 'px';
+});
 
 // Добавляем объявления
 var templCard = document.querySelector('#card');
