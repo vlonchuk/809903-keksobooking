@@ -14,6 +14,17 @@ var MAX_GUEST = 10;
 var Y_START = 250;
 var Y_END = 600;
 var PHOTO_ALT_DEF = 'Фотография жилья';
+var PHOTO_WIDTH = 45;
+var PHOTO_HEIGHT = 40;
+
+var PRICE_SUFFIX = '₽/ночь';
+var ARRIVE_CAP = 'Заезд после ';
+var LEAVE_CAP = 'выезд до ';
+var ROOMS_CAP = ' комнат';
+var ROOM_SNG = 'а';
+var ROOM_MLT = 'ы';
+var FOR_CAP = ' для ';
+var GUESTS_CAP = ' гостей'
 
 var CHECK_INOUT = [
   '12:00',
@@ -167,10 +178,10 @@ var addCard = function (accommodation, el) {
   elAvatar.src = accommodation.author.avatar;
   addText(el, '.popup__title', accommodation.offer.title);
   addText(el, '.popup__text--address', accommodation.offer.address);
-  addText(el, '.popup__text--price', accommodation.offer.price + '₽/ночь');
+  addText(el, '.popup__text--price', accommodation.offer.price + PRICE_SUFFIX);
   addText(el, '.popup__type', accommodation.offer.type);
-  addText(el, '.popup__text--capacity', accommodation.offer.rooms + ' комнат' + (accommodation.offer.rooms === 1 ? 'а' : 'ы') + ' для ' + accommodation.offer.guests + ' гостей');
-  addText(el, '.popup__text--time', 'Заезд после ' + accommodation.offer.checkin + ', выезд до ' + accommodation.offer.checkout);
+  addText(el, '.popup__text--capacity', accommodation.offer.rooms + ROOMS_CAP + (accommodation.offer.rooms === 1 ? ROOM_SNG : ROOM_MLT) + FOR_CAP + accommodation.offer.guests + GUESTS_CAP);
+  addText(el, '.popup__text--time', ARRIVE_CAP + accommodation.offer.checkin + ', ' + LEAVE_CAP + accommodation.offer.checkout);
   addText(el, '.popup__description', accommodation.offer.description);
 
   var elFeatures = el.querySelector('.popup__features');
@@ -192,8 +203,8 @@ var addCard = function (accommodation, el) {
     var elImg = document.createElement('img');
     elImg.src = photo;
     elImg.classList.add('popup__photo');
-    elImg.width = 45;
-    elImg.height = 40;
+    elImg.width = PHOTO_WIDTH;
+    elImg.height = PHOTO_HEIGHT;
     elImg.alt = PHOTO_ALT_DEF;
     elPhotos.appendChild(elImg);
   });
