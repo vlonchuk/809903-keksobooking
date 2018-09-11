@@ -24,7 +24,7 @@ var ROOMS_CAP = ' комнат';
 var ROOM_SNG = 'а';
 var ROOM_MLT = 'ы';
 var FOR_CAP = ' для ';
-var GUESTS_CAP = ' гостей'
+var GUESTS_CAP = ' гостей';
 
 var CHECK_INOUT = [
   '12:00',
