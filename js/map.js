@@ -173,9 +173,12 @@ var addText = function (parent, selector, text) {
   }
 };
 
-var addCard = function (accommodation, el) {
+var addCardAvatar = function (accommodation, el) {
   var elAvatar = el.querySelector('.popup__avatar');
   elAvatar.src = accommodation.author.avatar;
+};
+
+var addCardText = function (accommodation, el) {
   addText(el, '.popup__title', accommodation.offer.title);
   addText(el, '.popup__text--address', accommodation.offer.address);
   addText(el, '.popup__text--price', accommodation.offer.price + PRICE_SUFFIX);
@@ -183,7 +186,9 @@ var addCard = function (accommodation, el) {
   addText(el, '.popup__text--capacity', accommodation.offer.rooms + ROOMS_CAP + (accommodation.offer.rooms === 1 ? ROOM_SNG : ROOM_MLT) + FOR_CAP + accommodation.offer.guests + GUESTS_CAP);
   addText(el, '.popup__text--time', ARRIVE_CAP + accommodation.offer.checkin + ', ' + LEAVE_CAP + accommodation.offer.checkout);
   addText(el, '.popup__description', accommodation.offer.description);
+};
 
+var addCardFeatures = function (accommodation, el) {
   var elFeatures = el.querySelector('.popup__features');
   while (elFeatures.firstChild) {
     elFeatures.removeChild(elFeatures.firstChild);
@@ -194,7 +199,9 @@ var addCard = function (accommodation, el) {
     elFeature.classList.add('popup__feature--' + feature);
     elFeatures.appendChild(elFeature);
   });
+};
 
+var addCardPhotos = function (accommodation, el) {
   var elPhotos = el.querySelector('.popup__photos');
   while (elPhotos.firstChild) {
     elPhotos.removeChild(elPhotos.firstChild);
@@ -208,36 +215,49 @@ var addCard = function (accommodation, el) {
     elImg.alt = PHOTO_ALT_DEF;
     elPhotos.appendChild(elImg);
   });
+};
 
+var addCard = function (accommodation, el) {
+  addCardAvatar(accommodation, el);
+  addCardText(accommodation, el);
+  addCardFeatures(accommodation, el);
+  addCardPhotos(accommodation, el);
   return el;
 };
 
+var addPins = function () {
+  var templPin = document.querySelector('#pin');
+  var elOrgPin = templPin.content.querySelector('.map__pin');
+  var fragmentPins = document.createDocumentFragment();
+  accommodations.forEach(function (accommodation) {
+    fragmentPins.appendChild(addPin(accommodation, elOrgPin.cloneNode(true)));
+  });
+  addElement(fragmentPins, '.map__pins');
+};
+
+var correctPinsPos = function () {
+  var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  pins.forEach(function (pin) {
+    pin.left -= (pin.clientWidth / 2) + 'px';
+    pin.top += pin.top + pin.clientHeight + 'px';
+  });
+};
+
+var addPinCard = function (accommodation) {
+  var templCard = document.querySelector('#card');
+  var elOrgCard = templCard.content.querySelector('.map__card');
+  var newCard = addCard(accommodation, elOrgCard.cloneNode(true));
+  var elMap = document.querySelector('.map');
+  var elMapFilter = document.querySelector('.map__filters-container');
+  elMap.insertBefore(newCard, elMapFilter);
+};
+
+// Генерация данных
 var accommodations = generateData();
 removeClass('.map', 'map--faded');
-
 // Добавляем метки
-var templPin = document.querySelector('#pin');
-var elOrgPin = templPin.content.querySelector('.map__pin');
-var fragmentPins = document.createDocumentFragment();
-accommodations.forEach(function (accommodation) {
-  fragmentPins.appendChild(addPin(accommodation, elOrgPin.cloneNode(true)));
-});
-addElement(fragmentPins, '.map__pins');
-
+addPins();
 // Корректируем положение меток относительно их размеров
-var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-pins.forEach(function (pin) {
-  pin.left -= (pin.clientWidth / 2) + 'px';
-  pin.top += pin.top + pin.clientHeight + 'px';
-});
-
-// Добавляем объявления
-var templCard = document.querySelector('#card');
-var elOrgCard = templCard.content.querySelector('.map__card');
-var fragmentCards = document.createDocumentFragment();
-accommodations.forEach(function (accommodation) {
-  fragmentCards.appendChild(addCard(accommodation, elOrgCard.cloneNode(true)));
-});
-var elMap = document.querySelector('.map');
-var elMapFilter = document.querySelector('.map__filters-container');
-elMap.insertBefore(fragmentCards, elMapFilter);
+correctPinsPos();
+// Добавляем первое по порядку объявление
+addPinCard(accommodations[0]);
