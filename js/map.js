@@ -148,6 +148,13 @@ var addElement = function (fragment, selector) {
   parent.appendChild(fragment);
 };
 
+var addClass = function (selector, className) {
+  var element = document.querySelector(selector);
+  if (element) {
+    element.classList.add(className);
+  }
+};
+
 var removeClass = function (selector, className) {
   var element = document.querySelector(selector);
   if (element) {
@@ -225,12 +232,17 @@ var addCard = function (accommodation, el) {
   return el;
 };
 
-var addPins = function () {
+var addPins = function (accommodations) {
   var templPin = document.querySelector('#pin');
   var elOrgPin = templPin.content.querySelector('.map__pin');
   var fragmentPins = document.createDocumentFragment();
   accommodations.forEach(function (accommodation) {
-    fragmentPins.appendChild(addPin(accommodation, elOrgPin.cloneNode(true)));
+    var elNewPin = elOrgPin.cloneNode(true);
+    elNewPin.addEventListener('click', function () {
+      removePinCard();
+      addPinCard(accommodation);
+    });
+    fragmentPins.appendChild(addPin(accommodation, elNewPin));
   });
   addElement(fragmentPins, '.map__pins');
 };
@@ -238,9 +250,17 @@ var addPins = function () {
 var correctPinsPos = function () {
   var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
   pins.forEach(function (pin) {
-    pin.left -= (pin.clientWidth / 2) + 'px';
-    pin.top += pin.top + pin.clientHeight + 'px';
+    pin.offsetLeft -= (pin.clientWidth / 2) + 'px';
+    pin.offsetTop += pin.offsetTop + pin.clientHeight + 'px';
   });
+};
+
+var removePinCard = function () {
+  var elMap = document.querySelector('.map');
+  var elPinCard = elMap.querySelector('.map__card');
+  if (elPinCard) {
+    elMap.removeChild(elPinCard);
+  }
 };
 
 var addPinCard = function (accommodation) {
@@ -249,15 +269,70 @@ var addPinCard = function (accommodation) {
   var newCard = addCard(accommodation, elOrgCard.cloneNode(true));
   var elMap = document.querySelector('.map');
   var elMapFilter = document.querySelector('.map__filters-container');
+
+  var elPopupClose = newCard.querySelector('.popup__close');
+  if (elPopupClose) {
+    elPopupClose.addEventListener('click', function (evt) {
+      elMap.removeChild(evt.target.parentElement);
+    });
+  }
+
   elMap.insertBefore(newCard, elMapFilter);
 };
 
 // Генерация данных
-var accommodations = generateData();
-removeClass('.map', 'map--faded');
-// Добавляем метки
-addPins();
-// Корректируем положение меток относительно их размеров
-correctPinsPos();
-// Добавляем первое по порядку объявление
-addPinCard(accommodations[0]);
+var makeNewPins = function () {
+  var accommodations = generateData();
+  removeClass('.map', 'map--faded');
+  // Добавляем метки
+  addPins(accommodations);
+  // Корректируем положение меток относительно их размеров
+  correctPinsPos();
+  // Добавляем первое по порядку объявление
+  addPinCard(accommodations[0]);
+};
+
+var disableElements = function (selector) {
+  var elList = document.querySelectorAll(selector);
+  elList.forEach(function (el) {
+    el.setAttribute('disabled', '');
+  });
+};
+
+var enableElements = function (selector) {
+  var elList = document.querySelectorAll(selector);
+  elList.forEach(function (el) {
+    el.removeAttribute('disabled');
+  });
+};
+
+var disableMap = function () {
+  disableElements('input');
+  disableElements('select');
+};
+
+var activateMap = function () {
+  removeClass('.map', 'map--faded');
+  removeClass('.ad-form', 'ad-form--disabled');
+  enableElements('input');
+  enableElements('select');
+};
+
+var detectDefaultAddress = function () {
+  var elAddress = document.querySelector('#address');
+  if (elAddress) {
+    elAddress.value = (elPinMain.offsetLeft + Math.round(elPinMain.clientWidth / 2)) + ', ' + (elPinMain.offsetTop + Math.round(elPinMain.clientHeight / 2));
+  }
+};
+
+disableMap();
+
+var elPinMain = document.querySelector('.map__pin--main');
+if (elPinMain) {
+  detectDefaultAddress();
+  elPinMain.addEventListener('mouseup', function () {
+    detectDefaultAddress();
+    activateMap();
+    makeNewPins();
+  });
+}
