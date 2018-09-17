@@ -148,13 +148,6 @@ var addElement = function (fragment, selector) {
   parent.appendChild(fragment);
 };
 
-var addClass = function (selector, className) {
-  var element = document.querySelector(selector);
-  if (element) {
-    element.classList.add(className);
-  }
-};
-
 var removeClass = function (selector, className) {
   var element = document.querySelector(selector);
   if (element) {
