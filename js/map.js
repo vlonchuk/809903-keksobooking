@@ -58,6 +58,8 @@ var PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
 
+var elMap; // Ссылка на карту
+
 // Возврат случайного числа от 0 до num-1
 var getRand = function (num) {
   var size = 1.0 / num;
@@ -249,7 +251,6 @@ var correctPinsPos = function () {
 };
 
 var removePinCard = function () {
-  var elMap = document.querySelector('.map');
   var elPinCard = elMap.querySelector('.map__card');
   if (elPinCard) {
     elMap.removeChild(elPinCard);
@@ -260,7 +261,6 @@ var addPinCard = function (accommodation) {
   var templCard = document.querySelector('#card');
   var elOrgCard = templCard.content.querySelector('.map__card');
   var newCard = addCard(accommodation, elOrgCard.cloneNode(true));
-  var elMap = document.querySelector('.map');
   var elMapFilter = document.querySelector('.map__filters-container');
 
   var elPopupClose = newCard.querySelector('.popup__close');
@@ -311,21 +311,36 @@ var activateMap = function () {
   enableElements('select');
 };
 
-var detectDefaultAddress = function () {
-  var elAddress = document.querySelector('#address');
-  if (elAddress) {
-    elAddress.value = (elPinMain.offsetLeft + Math.round(elPinMain.clientWidth / 2)) + ', ' + (elPinMain.offsetTop + Math.round(elPinMain.clientHeight / 2));
+var init = function () {
+  elMap = document.querySelector('.map');
+  var elPinMain = document.querySelector('.map__pin--main');
+
+  var detectDefaultAddress = function () {
+    var elAddress = document.querySelector('#address');
+    if (elAddress) {
+      elAddress.value = (elPinMain.offsetLeft + Math.round(elPinMain.clientWidth / 2)) + ', ' + (elPinMain.offsetTop + Math.round(elPinMain.clientHeight / 2));
+    }
+  };
+
+  var onMapActivated = function () {
+    elPinMain.removeEventListener('mouseup', onMapActivated);
+    detectDefaultAddress();
+    activateMap();
+    makeNewPins();
+  };
+
+  var onPinMainMouseUp = function () {
+    detectDefaultAddress();
+  };
+
+  detectDefaultAddress();
+  if (elPinMain) {
+    elPinMain.addEventListener('mouseup', onMapActivated);
+    elPinMain.addEventListener('mouseup', onPinMainMouseUp);
   }
 };
 
 disableMap();
+init();
 
-var elPinMain = document.querySelector('.map__pin--main');
-if (elPinMain) {
-  detectDefaultAddress();
-  elPinMain.addEventListener('mouseup', function () {
-    detectDefaultAddress();
-    activateMap();
-    makeNewPins();
-  });
-}
+
