@@ -337,8 +337,9 @@ var setPriceMin = function (el, elPrice) {
 var initTypeValidation = function () {
   var elType = document.querySelector('#type');
   if (elType) {
+    var elPrice = document.querySelector('#price');
+    setPriceMin(elType, elPrice);
     elType.addEventListener('change', function () {
-      var elPrice = document.querySelector('#price');
       setPriceMin(elType, elPrice);
     });
   }
