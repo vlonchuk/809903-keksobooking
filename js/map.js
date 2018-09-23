@@ -11,8 +11,8 @@ var MAX_ROOM_COUNT = 5;
 var MIN_GUEST = 2;
 var MAX_GUEST = 10;
 
-var Y_START = 250;
-var Y_END = 600;
+var Y_START = 130;
+var Y_END = 630;
 var PHOTO_ALT_DEF = 'Фотография жилья';
 var PHOTO_WIDTH = 45;
 var PHOTO_HEIGHT = 40;
@@ -60,6 +60,10 @@ var PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
+
+var PIN_MAIN_HEIGHT = 60 + 22;
+
+var SELECTED_PIN_CLASS = 'map__pin--active';
 
 var elMap; // Ссылка на карту
 
@@ -154,10 +158,10 @@ var addElement = function (fragment, selector) {
 };
 
 var removeClass = function (selector, className) {
-  var element = document.querySelector(selector);
-  if (element) {
-    element.classList.remove(className);
-  }
+  var elements = document.querySelectorAll(selector);
+  elements.forEach(function (el) {
+    el.classList.remove(className);
+  });
 };
 
 var addPin = function (accommodation, el) {
@@ -230,6 +234,21 @@ var addCard = function (accommodation, el) {
   return el;
 };
 
+var elSelectedPin;
+
+var deselectPin = function () {
+  if (elSelectedPin) {
+    elSelectedPin.classList.remove(SELECTED_PIN_CLASS);
+    elSelectedPin = undefined;
+  }
+};
+
+var selectPin = function (pin) {
+  deselectPin();
+  elSelectedPin = pin;
+  elSelectedPin.classList.add(SELECTED_PIN_CLASS);
+};
+
 var addPins = function (accommodations) {
   var templPin = document.querySelector('#pin');
   var elOrgPin = templPin.content.querySelector('.map__pin');
@@ -239,6 +258,7 @@ var addPins = function (accommodations) {
     elNewPin.addEventListener('click', function () {
       removePinCard();
       addPinCard(accommodation);
+      selectPin(elNewPin);
     });
     fragmentPins.appendChild(addPin(accommodation, elNewPin));
   });
@@ -248,9 +268,8 @@ var addPins = function (accommodations) {
 var correctPinsPos = function () {
   var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
   pins.forEach(function (pin) {
-    var clientRect = pin.getBoundingClientRect();
-    pin.style.Left = clientRect.x - (clientRect.width / 2) + 'px';
-    pin.style.Top = clientRect.y + clientRect.height + 'px';
+    pin.style.Left = pin.offsetLeft - Math.round(pin.clientWidth / 2) + 'px';
+    pin.style.Top = pin.offsetTop + pin.clientHeight + 'px';
   });
 };
 
@@ -270,6 +289,7 @@ var addPinCard = function (accommodation) {
   var elPopupClose = newCard.querySelector('.popup__close');
   if (elPopupClose) {
     elPopupClose.addEventListener('click', function (evt) {
+      deselectPin();
       elMap.removeChild(evt.target.parentElement);
     });
   }
@@ -417,27 +437,113 @@ var initVariables = function () {
   elAddress = document.querySelector('#address');
 };
 
-var detectDefaultAddress = function () {
+var detectAddress = function () {
   if (elAddress) {
-    elAddress.value = (elPinMain.offsetLeft + Math.round(elPinMain.clientWidth / 2)) + ', ' + (elPinMain.offsetTop + Math.round(elPinMain.clientHeight / 2));
+    elAddress.value = getPinMainX(elPinMain.offsetLeft) + ', ' + getPinMainY(elPinMain.offsetTop);
   }
 };
 
+var onPinMainOnceMouseDown = function () {
+  document.addEventListener('mouseup', onMapActivated);
+};
+
 var onMapActivated = function () {
-  elPinMain.removeEventListener('mouseup', onMapActivated);
-  detectDefaultAddress();
+  elPinMain.removeEventListener('mousedown', onPinMainOnceMouseDown);
+  document.removeEventListener('mouseup', onMapActivated);
+  detectAddress();
   activateMap();
   makeNewPins();
 };
 
-var onPinMainMouseUp = function () {
-  detectDefaultAddress();
+// Вычисляет координату острого конца главной метки, относительно ее свойства Left
+var getPinMainX = function (left) {
+  return left + Math.round(elPinMain.clientWidth / 2);
 };
 
-var initPinMainMouseUpHandler = function () {
+// Вычисляет значения свойства Left главной метки, относительно положения ее острого конца
+var getPinMainLeft = function (x) {
+  return x - (elPinMain.clientWidth / 2);
+};
+
+// Вычисляет координату Y острого конца главной метки, относительно ее свойства Top и высоты
+var getPinMainY = function (top) {
+  return top + PIN_MAIN_HEIGHT;
+};
+
+// Вычисляет значения свойства Top главной метки, относительно положения ее острого конца
+var getPinMainTop = function (y) {
+  return y - PIN_MAIN_HEIGHT;
+};
+
+var initPinMainHandlers = function () {
   if (elPinMain) {
-    elPinMain.addEventListener('mouseup', onMapActivated);
-    elPinMain.addEventListener('mouseup', onPinMainMouseUp);
+
+    var onPinMainMouseDown = function (downEvt) {
+      var startPoint = {
+        x: downEvt.pageX,
+        y: downEvt.pageY
+      };
+
+      var onMouseMove = function (moveEvt) {
+        // Оригинальная позиция мыши
+        var mousePoint = {
+          clientX: moveEvt.pageX,
+          clientY: moveEvt.pageY
+        };
+
+        // Корректируем координаты мыши
+        mousePoint.clientX = mousePoint.clientX < elMap.offsetLeft ? elMap.offsetLeft : mousePoint.clientX;
+        mousePoint.clientX = mousePoint.clientX > elMap.offsetLeft + elMap.clientWidth ? elMap.offsetLeft + elMap.clientWidth : mousePoint.clientX;
+        mousePoint.clientY = mousePoint.clientY < getPinMainX(Y_START) - PIN_MAIN_HEIGHT ? getPinMainX(Y_START) - PIN_MAIN_HEIGHT : mousePoint.clientY;
+        mousePoint.clientY = mousePoint.clientY > getPinMainX(Y_END) - PIN_MAIN_HEIGHT ? getPinMainX(Y_END) - PIN_MAIN_HEIGHT : mousePoint.clientY;
+
+        // Определяем сдвиг курсора
+        var shift = {
+          x: mousePoint.clientX - startPoint.x,
+          y: mousePoint.clientY - startPoint.y
+        };
+
+        // Обновляем стартовую позицию курсора
+        startPoint = {
+          offset: startPoint.offset,
+          x: mousePoint.clientX,
+          y: mousePoint.clientY
+        };
+
+        // Определяем положение элемента
+        var newLeft = elPinMain.offsetLeft + shift.x;
+        var newTop = elPinMain.offsetTop + shift.y;
+
+        // Определяем координаты острого конца
+        var pinPos = {
+          x: getPinMainX(newLeft),
+          y: getPinMainY(newTop)
+        };
+
+        // Корректируем положение элемента отностельного острого конца
+        newLeft = pinPos.x < 0 ? getPinMainLeft(0) : newLeft;
+        newLeft = pinPos.x > elMap.clientWidth ? getPinMainLeft(elMap.clientWidth) : newLeft;
+        newTop = pinPos.y < Y_START ? getPinMainTop(Y_START) : newTop;
+        newTop = pinPos.y > Y_END ? getPinMainTop(Y_END) : newTop;
+
+        // Перемещаем элемент на новую позицию
+        elPinMain.style.left = newLeft + 'px';
+        elPinMain.style.top = newTop + 'px';
+        detectAddress();
+      };
+
+      var onMouseUp = function () {
+        detectAddress();
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    };
+
+    elPinMain.addEventListener('mousedown', onPinMainMouseDown);
+    elPinMain.addEventListener('mousedown', onPinMainOnceMouseDown);
   }
 };
 
@@ -445,8 +551,8 @@ var init = function () {
   initVariables();
   disableMap();
   initValidation();
-  detectDefaultAddress();
-  initPinMainMouseUpHandler();
+  detectAddress();
+  initPinMainHandlers();
 };
 
 init();
