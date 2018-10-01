@@ -62,6 +62,32 @@
       elements.forEach(function (el) {
         el.classList.remove(className);
       });
+    },
+
+    addClass: function (selector, className) {
+      var elements = document.querySelectorAll(selector);
+      elements.forEach(function (el) {
+        el.classList.add(className);
+      });
+    },
+
+    disableElements: function (selector) {
+      var elList = document.querySelectorAll(selector);
+      elList.forEach(function (el) {
+        el.setAttribute('disabled', '');
+      });
+    },
+
+    enableElements: function (selector) {
+      var elList = document.querySelectorAll(selector);
+      elList.forEach(function (el) {
+        el.removeAttribute('disabled');
+      });
+    },
+
+    disableMap: function () {
+      this.disableElements('input');
+      this.disableElements('select');
     }
   };
 })();

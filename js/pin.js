@@ -60,14 +60,21 @@
   };
 
   window.pin = {
-    makeNewPins: function (ctxRef) {
+    makeNewPins: function (ctxRef, accommodations) {
       ctx = ctxRef;
-      var accommodations = window.data.generateData();
       window.api.removeClass('.map', 'map--faded');
       // Добавляем метки
       addPins(accommodations);
       // Корректируем положение меток относительно их размеров
       correctPinsPos();
+    },
+
+    removePins: function () {
+      var elMapPins = ctx.elMap.querySelector('.map__pins');
+      var pinList = elMapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
+      pinList.forEach(function (el) {
+        elMapPins.removeChild(el);
+      });
     }
   };
 })();
