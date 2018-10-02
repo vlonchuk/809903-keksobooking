@@ -62,7 +62,7 @@
   window.pin = {
     makeNewPins: function (ctxRef, accommodations) {
       ctx = ctxRef;
-      window.api.removeClass('.map', 'map--faded');
+      ctx.elMap.classList.remove('map--faded');
       // Добавляем метки
       addPins(accommodations);
       // Корректируем положение меток относительно их размеров

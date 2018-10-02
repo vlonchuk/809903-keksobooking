@@ -8,11 +8,13 @@
   var ERR_GENERIC = 'Произошла ошибка соединения';
   var ERR_TIMEOUT = 'Запрос не успел выполниться за ' + TIMEOUT + 'мс';
 
+  var HTTP_SUCCESS = 200;
+
   window.backend = {
     load: function (onLoad, onError) {
       var req = new XMLHttpRequest();
       req.addEventListener('load', function () {
-        if (req.status === 200) {
+        if (req.status === HTTP_SUCCESS) {
           try {
             var json = JSON.parse(req.responseText);
             onLoad(json);
@@ -41,7 +43,7 @@
       var req = new XMLHttpRequest();
 
       req.addEventListener('load', function () {
-        if (req.status !== 200) {
+        if (req.status !== HTTP_SUCCESS) {
           onError(req.status + ' ' + req.statusText);
         } else {
           onLoad();

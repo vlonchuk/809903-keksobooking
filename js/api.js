@@ -57,14 +57,14 @@
       parent.appendChild(fragment);
     },
 
-    removeClass: function (selector, className) {
+    removeClasses: function (selector, className) {
       var elements = document.querySelectorAll(selector);
       elements.forEach(function (el) {
         el.classList.remove(className);
       });
     },
 
-    addClass: function (selector, className) {
+    addClasses: function (selector, className) {
       var elements = document.querySelectorAll(selector);
       elements.forEach(function (el) {
         el.classList.add(className);

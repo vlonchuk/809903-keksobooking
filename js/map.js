@@ -5,17 +5,18 @@
   };
 
   var activateMap = function () {
-    window.api.removeClass('.map', 'map--faded');
-    window.api.removeClass('.ad-form', 'ad-form--disabled');
+    ctx.elMap.classList.remove('map--faded');
+    ctx.elForm.classList.remove('ad-form--disabled');
     window.api.enableElements('input');
     window.api.enableElements('select');
   };
 
   var initContext = function () {
     ctx.elMain = document.querySelector('main');
-    ctx.elMap = document.querySelector('.map');
-    ctx.elPinMain = document.querySelector('.map__pin--main');
-    ctx.elAddress = document.querySelector('#address');
+    ctx.elMap = ctx.elMain.querySelector('.map');
+    ctx.elForm = ctx.elMain.querySelector('.ad-form');
+    ctx.elPinMain = ctx.elMap.querySelector('.map__pin--main');
+    ctx.elAddress = ctx.elForm.querySelector('#address');
     ctx.onPinMainOnceMouseDown = onPinMainOnceMouseDown;
     ctx.pinMainLeft = ctx.elPinMain.offsetLeft;
     ctx.pinMainTop = ctx.elPinMain.offsetTop;

@@ -11,7 +11,7 @@
   };
 
   var onKeyDown = function (evt) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === window.consts.KEY_ESCAPE) {
       elError.classList.add('hidden');
       document.removeEventListener('keydown', onKeyDown);
     }

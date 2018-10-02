@@ -97,11 +97,11 @@
   };
 
   var formReset = function () {
-    form.reset();
+    ctx.elForm.reset();
     window.pin.removePins();
     window.api.disableMap();
     ctx.elMap.classList.add('map--faded');
-    window.api.addClass('.ad-form', 'ad-form--disabled');
+    ctx.elForm.classList.add('ad-form--disabled');
     ctx.elPinMain.style.left = ctx.pinMainLeft + 'px';
     ctx.elPinMain.style.top = ctx.pinMainTop + 'px';
     window.pinMain.detectAddress(ctx);
@@ -123,24 +123,16 @@
       ctx = ctxRef;
     }
 
-    if (!form) {
-      form = document.querySelector('.ad-form');
-    }
-
-    if (form) {
-      form.addEventListener('submit', function (evt) {
-        window.backend.save(new FormData(form), onSuccessSubmit, onFailSubmit);
-        evt.preventDefault();
-      });
-    }
+    ctx.elForm.addEventListener('submit', function (evt) {
+      window.backend.save(new FormData(form), onSuccessSubmit, onFailSubmit);
+      evt.preventDefault();
+    });
   };
 
   var initResetButton = function () {
-    var elReset = form.querySelector('.ad-form__reset');
+    var elReset = ctx.elForm.querySelector('.ad-form__reset');
     if (elReset) {
-      elReset.addEventListener('click', function () {
-        formReset();
-      });
+      elReset.addEventListener('click', formReset);
     }
   };
 
