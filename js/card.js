@@ -75,20 +75,20 @@
     return el;
   };
 
-  var removePinCard = function () {
-    var elPinCard = ctx.elMap.querySelector('.map__card');
-    if (elPinCard) {
-      ctx.elMap.removeChild(elPinCard);
-    }
-  };
-
   window.card = {
+    removePinCard: function () {
+      var elPinCard = ctx.elMap.querySelector('.map__card');
+      if (elPinCard) {
+        ctx.elMap.removeChild(elPinCard);
+      }
+    },
+
     addPinCard: function (ctxRef, accommodation, onDeselectPin) {
       if (!ctx) {
         ctx = ctxRef;
       }
 
-      removePinCard();
+      this.removePinCard();
 
       var templCard = document.querySelector('#card');
       var elOrgCard = templCard.content.querySelector('.map__card');

@@ -5,7 +5,6 @@
   var PALACE_ROOM_CHOICE = 0;
 
   var ctx; // Ссылка на контекст с глобальными переменными
-  var form;
 
   var setPriceMin = function (el, elPrice) {
     if (el.selectedIndex !== -1) {
@@ -92,12 +91,14 @@
     elCapacity = document.querySelector('#capacity');
     if (elRoomNumber && elCapacity) {
       elRoomNumber.addEventListener('change', onRoomNumberChange);
+      elCapacity.addEventListener('change', onRoomNumberChange);
       onRoomNumberChange();
     }
   };
 
   var formReset = function () {
     ctx.elForm.reset();
+    window.card.removePinCard();
     window.pin.removePins();
     window.api.disableMap();
     ctx.elMap.classList.add('map--faded');
@@ -124,7 +125,7 @@
     }
 
     ctx.elForm.addEventListener('submit', function (evt) {
-      window.backend.save(new FormData(form), onSuccessSubmit, onFailSubmit);
+      window.backend.save(new FormData(ctx.elForm), onSuccessSubmit, onFailSubmit);
       evt.preventDefault();
     });
   };
