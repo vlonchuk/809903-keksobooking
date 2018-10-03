@@ -4,6 +4,8 @@
   var PALACE_ROOM_NUMBER = 100;
   var PALACE_ROOM_CHOICE = 0;
 
+  var ctx; // Ссылка на контекст с глобальными переменными
+
   var setPriceMin = function (el, elPrice) {
     if (el.selectedIndex !== -1) {
       var value = el.options[el.selectedIndex].value;
@@ -89,12 +91,56 @@
     elCapacity = document.querySelector('#capacity');
     if (elRoomNumber && elCapacity) {
       elRoomNumber.addEventListener('change', onRoomNumberChange);
+      elCapacity.addEventListener('change', onRoomNumberChange);
       onRoomNumberChange();
     }
   };
 
+  var formReset = function () {
+    ctx.elForm.reset();
+    window.card.removePinCard();
+    window.pin.removePins();
+    window.api.disableMap();
+    ctx.elMap.classList.add('map--faded');
+    ctx.elForm.classList.add('ad-form--disabled');
+    ctx.elPinMain.style.left = ctx.pinMainLeft + 'px';
+    ctx.elPinMain.style.top = ctx.pinMainTop + 'px';
+    window.pinMain.detectAddress(ctx);
+    window.pinMain.initOnceMouseDown();
+    window.scrollTo(0, 0);
+  };
+
+  var onSuccessSubmit = function () {
+    formReset();
+    window.success.showSuccess(ctx);
+  };
+
+  var onFailSubmit = function (message) {
+    window.fail.showError(ctx, message);
+  };
+
+  var initSubmit = function (ctxRef) {
+    if (!ctx) {
+      ctx = ctxRef;
+    }
+
+    ctx.elForm.addEventListener('submit', function (evt) {
+      window.backend.save(new FormData(ctx.elForm), onSuccessSubmit, onFailSubmit);
+      evt.preventDefault();
+    });
+  };
+
+  var initResetButton = function () {
+    var elReset = ctx.elForm.querySelector('.ad-form__reset');
+    if (elReset) {
+      elReset.addEventListener('click', formReset);
+    }
+  };
+
   window.form = {
-    initValidation: function () {
+    initValidation: function (ctxRef) {
+      initSubmit(ctxRef);
+      initResetButton();
       initTypeValidation();
       initTimeValidation();
       initCapacityValidation();

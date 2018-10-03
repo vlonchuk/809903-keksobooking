@@ -33,7 +33,15 @@
       ctx.elAddress.value = getPinMainX(ctx.elPinMain.offsetLeft) + ', ' + getPinMainY(ctx.elPinMain.offsetTop);
     },
 
-    initPinMainHandlers: function (ctxRef) {
+    initOnceMouseDown: function (ctxRef) {
+      if (!ctx) {
+        ctx = ctxRef;
+      }
+
+      ctx.elPinMain.addEventListener('mousedown', ctx.onPinMainOnceMouseDown);
+    },
+
+    initHandlers: function (ctxRef) {
       if (!ctx) {
         ctx = ctxRef;
       }
@@ -102,7 +110,7 @@
       };
 
       ctx.elPinMain.addEventListener('mousedown', onPinMainMouseDown);
-      ctx.elPinMain.addEventListener('mousedown', ctx.onPinMainOnceMouseDown);
+      this.initOnceMouseDown();
     }
   };
 })();
