@@ -98,9 +98,10 @@
 
   var formReset = function () {
     ctx.elForm.reset();
-    window.card.removePinCard();
+    window.card.removePinCard(ctx);
     window.pin.removePins();
     window.api.disableMap();
+    window.filter.clear();
     ctx.elMap.classList.add('map--faded');
     ctx.elForm.classList.add('ad-form--disabled');
     ctx.elPinMain.style.left = ctx.pinMainLeft + 'px';

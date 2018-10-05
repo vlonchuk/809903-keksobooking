@@ -76,7 +76,11 @@
   };
 
   window.card = {
-    removePinCard: function () {
+    removePinCard: function (ctxRef) {
+      if (!ctx) {
+        ctx = ctxRef;
+      }
+
       var elPinCard = ctx.elMap.querySelector('.map__card');
       if (elPinCard) {
         ctx.elMap.removeChild(elPinCard);
