@@ -92,6 +92,8 @@
     window.form.initValidation(ctx);
     window.pinMain.detectAddress(ctx);
     window.pinMain.initHandlers(ctx);
+    window.avatar.init(ctx);
+    window.photo.init(ctx);
   };
 
   init();

@@ -44,14 +44,13 @@
   var onTimeChange = function (evt) {
     var source = evt.target;
     var dest = (source === elTimein ? elTimeout : elTimein);
-    for (var i = 0; i < dest.options.length; i++) {
-      var opt = dest.options[i];
-      var result = (source.value === opt.value);
-      if (result) {
+    Array.prototype.every.call(dest.options, function (opt) {
+      var result = (source.value !== opt.value);
+      if (!result) {
         opt.selected = true;
-        break;
       }
-    }
+      return result;
+    });
   };
 
   var initTimeValidation = function () {
@@ -69,8 +68,7 @@
   var onRoomNumberChange = function () {
     var roomNumber = parseInt(elRoomNumber.value, 10);
     var valid = true;
-    for (var i = 0; i < elCapacity.options.length; i++) {
-      var opt = elCapacity.options[i];
+    Array.prototype.forEach.call(elCapacity.options, function (opt) {
       var optRoomNumber = parseInt(opt.value, 10);
       if (roomNumber !== PALACE_ROOM_NUMBER) {
         opt.disabled = !(roomNumber >= optRoomNumber && optRoomNumber !== PALACE_ROOM_CHOICE);
@@ -81,7 +79,7 @@
       if (opt.selected) {
         valid = !opt.disabled;
       }
-    }
+    });
 
     elCapacity.setCustomValidity((valid ? '' : 'Введено неверное значение'));
   };
@@ -102,6 +100,8 @@
     window.pin.removePins();
     window.api.disableMap();
     window.filter.clear();
+    window.avatar.clear();
+    window.photo.clear();
     ctx.elMap.classList.add('map--faded');
     ctx.elForm.classList.add('ad-form--disabled');
     ctx.elPinMain.style.left = ctx.pinMainLeft + 'px';
