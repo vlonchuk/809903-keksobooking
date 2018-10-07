@@ -13,8 +13,9 @@
   var activateMap = function () {
     ctx.elMap.classList.remove('map--faded');
     ctx.elForm.classList.remove('ad-form--disabled');
-    window.api.enableElements('input');
-    window.api.enableElements('select');
+    window.api.enableElements(ctx.elForm, 'input');
+    window.api.enableElements(ctx.elForm, 'select');
+    window.api.enableElements(ctx.elForm, '.ad-form__element--submit');
   };
 
   var initContext = function () {
@@ -88,7 +89,7 @@
 
   var init = function () {
     initContext();
-    window.api.disableMap();
+    window.api.disableMap(ctx.elForm);
     window.form.initValidation(ctx);
     window.pinMain.detectAddress(ctx);
     window.pinMain.initHandlers(ctx);
