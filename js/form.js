@@ -98,7 +98,7 @@
     ctx.elForm.reset();
     window.card.removePinCard(ctx);
     window.pin.removePins();
-    window.api.disableMap();
+    window.api.disableMap(ctx);
     window.filter.clear();
     window.avatar.clear();
     window.photo.clear();

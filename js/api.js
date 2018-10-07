@@ -71,7 +71,7 @@
       });
     },
 
-    disableElements: function (parent, selector) {
+    disableElements: function (selector, parent) {
       parent = parent || document;
       var elList = parent.querySelectorAll(selector);
       elList.forEach(function (el) {
@@ -79,7 +79,7 @@
       });
     },
 
-    enableElements: function (parent, selector) {
+    enableElements: function (selector, parent) {
       parent = parent || document;
       var elList = parent.querySelectorAll(selector);
       elList.forEach(function (el) {
@@ -87,10 +87,12 @@
       });
     },
 
-    disableMap: function (parent) {
-      this.disableElements(parent, 'input');
-      this.disableElements(parent, 'select');
-      this.disableElements(parent, '.ad-form__element--submit');
+    disableMap: function (ctx) {
+      this.disableElements('input', ctx.elFilter);
+      this.disableElements('select', ctx.elFilter);
+      this.disableElements('input', ctx.elForm);
+      this.disableElements('select', ctx.elForm);
+      this.disableElements('.ad-form__element--submit', ctx.elForm);
     }
   };
 })();
