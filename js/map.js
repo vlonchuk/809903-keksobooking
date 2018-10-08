@@ -15,6 +15,7 @@
     ctx.elForm.classList.remove('ad-form--disabled');
     window.api.enableElements('input');
     window.api.enableElements('select');
+    window.api.enableElements('.ad-form__element--submit', ctx.elForm);
   };
 
   var initContext = function () {
@@ -88,10 +89,12 @@
 
   var init = function () {
     initContext();
-    window.api.disableMap();
+    window.api.disableMap(ctx);
     window.form.initValidation(ctx);
     window.pinMain.detectAddress(ctx);
     window.pinMain.initHandlers(ctx);
+    window.avatar.init(ctx);
+    window.photo.init(ctx);
   };
 
   init();

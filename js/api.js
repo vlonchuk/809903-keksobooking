@@ -71,23 +71,28 @@
       });
     },
 
-    disableElements: function (selector) {
-      var elList = document.querySelectorAll(selector);
+    disableElements: function (selector, parent) {
+      parent = parent || document;
+      var elList = parent.querySelectorAll(selector);
       elList.forEach(function (el) {
         el.setAttribute('disabled', '');
       });
     },
 
-    enableElements: function (selector) {
-      var elList = document.querySelectorAll(selector);
+    enableElements: function (selector, parent) {
+      parent = parent || document;
+      var elList = parent.querySelectorAll(selector);
       elList.forEach(function (el) {
         el.removeAttribute('disabled');
       });
     },
 
-    disableMap: function () {
-      this.disableElements('input');
-      this.disableElements('select');
+    disableMap: function (ctx) {
+      this.disableElements('input', ctx.elFilter);
+      this.disableElements('select', ctx.elFilter);
+      this.disableElements('input', ctx.elForm);
+      this.disableElements('select', ctx.elForm);
+      this.disableElements('.ad-form__element--submit', ctx.elForm);
     }
   };
 })();
