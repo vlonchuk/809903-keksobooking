@@ -24,10 +24,10 @@
       }
 
       if (!elError) {
-        var templError = document.querySelector('#error');
-        if (templError) {
-          var elOrgError = templError.content.querySelector('.error');
-          elError = elOrgError.cloneNode(true);
+        var templ = document.querySelector('#error');
+        if (templ) {
+          var elOrg = templ.content.querySelector('.error');
+          elError = elOrg.cloneNode(true);
           var button = elError.querySelector('.error__button');
           button.addEventListener('click', function () {
             elError.classList.add('hidden');

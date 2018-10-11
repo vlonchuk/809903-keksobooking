@@ -46,8 +46,8 @@
     },
 
     clear: function () {
-      var photoList = elParent.querySelectorAll('.ad-form__photo');
-      photoList.forEach(function (el) {
+      var list = elParent.querySelectorAll('.ad-form__photo');
+      list.forEach(function (el) {
         elParent.removeChild(el);
       });
       elPreview = document.createElement('div');

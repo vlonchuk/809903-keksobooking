@@ -10,7 +10,7 @@
   var filterTimeout;
   var filteredData;
 
-  var activateMap = function () {
+  var activate = function () {
     ctx.elMap.classList.remove('map--faded');
     ctx.elForm.classList.remove('ad-form--disabled');
     window.api.enableElements('input');
@@ -37,12 +37,12 @@
   };
 
   var onPinMainOnceMouseDown = function () {
-    document.addEventListener('mouseup', onMapActivated);
+    document.addEventListener('mouseup', onActivated);
   };
 
   var onLoadDataSuccess = function (data) {
     accomodations = data;
-    activateMap();
+    activate();
     filter.filterData(accomodations);
   };
 
@@ -65,12 +65,9 @@
         }
       }
 
-      var pins = ctx.elMapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-      pins.forEach(function (pin) {
-        ctx.elMapPins.removeChild(pin);
-      });
-      window.card.removePinCard(ctx);
-      window.pin.makeNewPins(ctx, data);
+      window.card.remove(ctx);
+      window.pin.remove();
+      window.pin.makeNew(ctx, data);
       filteredData = data;
     }, FILTER_TIMEOUT);
   };
@@ -80,9 +77,9 @@
     window.fail.showError(ctx, message);
   };
 
-  var onMapActivated = function () {
+  var onActivated = function () {
     ctx.elPinMain.removeEventListener('mousedown', onPinMainOnceMouseDown);
-    document.removeEventListener('mouseup', onMapActivated);
+    document.removeEventListener('mouseup', onActivated);
     window.pinMain.detectAddress(ctx);
     window.backend.load(onLoadDataSuccess, onLoadDataFail);
   };

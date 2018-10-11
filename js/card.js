@@ -23,12 +23,12 @@
     }
   };
 
-  var addCardAvatar = function (accommodation, el) {
+  var addAvatar = function (accommodation, el) {
     var elAvatar = el.querySelector('.popup__avatar');
     elAvatar.src = accommodation.author.avatar;
   };
 
-  var addCardText = function (accommodation, el) {
+  var addPopup = function (accommodation, el) {
     addText(el, '.popup__title', accommodation.offer.title);
     addText(el, '.popup__text--address', accommodation.offer.address);
     addText(el, '.popup__text--price', accommodation.offer.price + PRICE_SUFFIX);
@@ -38,7 +38,7 @@
     addText(el, '.popup__description', accommodation.offer.description);
   };
 
-  var addCardFeatures = function (accommodation, el) {
+  var addFeatures = function (accommodation, el) {
     var elFeatures = el.querySelector('.popup__features');
     while (elFeatures.firstChild) {
       elFeatures.removeChild(elFeatures.firstChild);
@@ -51,11 +51,9 @@
     });
   };
 
-  var addCardPhotos = function (accommodation, el) {
+  var addPhotos = function (accommodation, el) {
     var elPhotos = el.querySelector('.popup__photos');
-    while (elPhotos.firstChild) {
-      elPhotos.removeChild(elPhotos.firstChild);
-    }
+    elPhotos.innerHTML = '';
     accommodation.offer.photos.forEach(function (photo) {
       var elImg = document.createElement('img');
       elImg.src = photo;
@@ -67,44 +65,67 @@
     });
   };
 
-  var addCard = function (accommodation, el) {
-    addCardAvatar(accommodation, el);
-    addCardText(accommodation, el);
-    addCardFeatures(accommodation, el);
-    addCardPhotos(accommodation, el);
+  var addAll = function (accommodation, el) {
+    addAvatar(accommodation, el);
+    addPopup(accommodation, el);
+    addFeatures(accommodation, el);
+    addPhotos(accommodation, el);
     return el;
   };
 
+  var elOrg; // Cсылка на шаблон карточки
+  var elInsertBefore; // Ссылка на элемент, перед которым вставлять карточку
+  var elPopup; // Сама карточка
+
+  var addEventHandlers = function (onDeselectPin) {
+    var elPopupClose = elPopup.querySelector('.popup__close');
+    if (elPopupClose) {
+      elPopupClose.addEventListener('click', function () {
+        onDeselectPin();
+        window.card.remove();
+      });
+    }
+
+    var onKeyDown = function (evt) {
+      if (evt.keyCode === window.consts.KEY_ESCAPE) {
+        onDeselectPin();
+        window.card.remove();
+        document.removeEventListener('keydown', onKeyDown);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+  };
+
   window.card = {
-    removePinCard: function (ctxRef) {
+    remove: function (ctxRef) {
       if (!ctx) {
         ctx = ctxRef;
       }
 
-      var elPinCard = ctx.elMap.querySelector('.map__card');
-      if (elPinCard) {
-        ctx.elMap.removeChild(elPinCard);
+      if (elPopup) {
+        ctx.elMap.removeChild(elPopup);
+        elPopup = null;
       }
     },
 
-    addPinCard: function (ctxRef, accommodation, onDeselectPin) {
+    add: function (ctxRef, accommodation, onDeselectPin) {
       if (!ctx) {
         ctx = ctxRef;
       }
 
-      this.removePinCard();
+      this.remove();
 
-      var templCard = document.querySelector('#card');
-      var elOrgCard = templCard.content.querySelector('.map__card');
-      var newCard = addCard(accommodation, elOrgCard.cloneNode(true));
-      var elMapFilter = document.querySelector('.map__filters-container');
-
-      var elPopupClose = newCard.querySelector('.popup__close');
-      if (elPopupClose) {
-        elPopupClose.addEventListener('click', onDeselectPin);
+      if (!elOrg) {
+        var templ = document.querySelector('#card');
+        elOrg = templ.content.querySelector('.map__card');
+      }
+      elPopup = addAll(accommodation, elOrg.cloneNode(true));
+      if (!elInsertBefore) {
+        elInsertBefore = document.querySelector('.map__filters-container');
       }
 
-      ctx.elMap.insertBefore(newCard, elMapFilter);
+      ctx.elMap.insertBefore(elPopup, elInsertBefore);
+      addEventHandlers(onDeselectPin);
     }
   };
 })();

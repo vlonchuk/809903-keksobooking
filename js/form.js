@@ -5,10 +5,12 @@
   var PALACE_ROOM_CHOICE = 0;
 
   var ctx; // Ссылка на контекст с глобальными переменными
+  var elType; // Ссылка на тип размещения
+  var elPrice; // Ссылка на стоимость
 
-  var setPriceMin = function (el, elPrice) {
-    if (el.selectedIndex !== -1) {
-      var value = el.options[el.selectedIndex].value;
+  var setPriceMin = function () {
+    if (elType.selectedIndex !== -1) {
+      var value = elType.options[elType.selectedIndex].value;
       switch (value) {
         case 'bungalo':
           elPrice.min = 0;
@@ -28,12 +30,16 @@
   };
 
   var initTypeValidation = function () {
-    var elType = document.querySelector('#type');
+    if (!elType) {
+      elType = document.querySelector('#type');
+    }
     if (elType) {
-      var elPrice = document.querySelector('#price');
-      setPriceMin(elType, elPrice);
+      if (!elPrice) {
+        elPrice = document.querySelector('#price');
+      }
+      setPriceMin();
       elType.addEventListener('change', function () {
-        setPriceMin(elType, elPrice);
+        setPriceMin();
       });
     }
   };
@@ -94,14 +100,15 @@
     }
   };
 
-  var formReset = function () {
+  var reset = function () {
     ctx.elForm.reset();
-    window.card.removePinCard(ctx);
-    window.pin.removePins();
+    window.card.remove(ctx);
+    window.pin.remove();
     window.api.disableMap(ctx);
     window.filter.clear();
     window.avatar.clear();
     window.photo.clear();
+    setPriceMin();
     ctx.elMap.classList.add('map--faded');
     ctx.elForm.classList.add('ad-form--disabled');
     ctx.elPinMain.style.left = ctx.pinMainLeft + 'px';
@@ -112,8 +119,8 @@
   };
 
   var onSuccessSubmit = function () {
-    formReset();
-    window.success.showSuccess(ctx);
+    reset();
+    window.success.show(ctx);
   };
 
   var onFailSubmit = function (message) {
@@ -134,7 +141,7 @@
   var initResetButton = function () {
     var elReset = ctx.elForm.querySelector('.ad-form__reset');
     if (elReset) {
-      elReset.addEventListener('click', formReset);
+      elReset.addEventListener('click', reset);
     }
   };
 

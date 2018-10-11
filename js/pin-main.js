@@ -1,28 +1,28 @@
 'use strict';
 
 (function () {
-  var PIN_MAIN_HEIGHT = 60 + 22;
+  var HEIGHT = 60 + 22;
 
   var ctx; // Ссылка на контекст с глобальными переменными
 
   // Вычисляет координату острого конца главной метки, относительно ее свойства Left
-  var getPinMainX = function (left) {
+  var getX = function (left) {
     return left + Math.round(ctx.elPinMain.clientWidth / 2);
   };
 
   // Вычисляет значения свойства Left главной метки, относительно положения ее острого конца
-  var getPinMainLeft = function (x) {
+  var getLeft = function (x) {
     return x - (ctx.elPinMain.clientWidth / 2);
   };
 
   // Вычисляет координату Y острого конца главной метки, относительно ее свойства Top и высоты
-  var getPinMainY = function (top) {
-    return top + PIN_MAIN_HEIGHT;
+  var getY = function (top) {
+    return top + HEIGHT;
   };
 
   // Вычисляет значения свойства Top главной метки, относительно положения ее острого конца
-  var getPinMainTop = function (y) {
-    return y - PIN_MAIN_HEIGHT;
+  var getTop = function (y) {
+    return y - HEIGHT;
   };
 
   window.pinMain = {
@@ -30,7 +30,7 @@
       if (!ctx) {
         ctx = ctxRef;
       }
-      ctx.elAddress.value = getPinMainX(ctx.elPinMain.offsetLeft) + ', ' + getPinMainY(ctx.elPinMain.offsetTop);
+      ctx.elAddress.value = getX(ctx.elPinMain.offsetLeft) + ', ' + getY(ctx.elPinMain.offsetTop);
     },
 
     initOnceMouseDown: function (ctxRef) {
@@ -46,7 +46,7 @@
         ctx = ctxRef;
       }
 
-      var onPinMainMouseDown = function (downEvt) {
+      var onMouseDown = function (downEvt) {
         var startPoint = {
           x: downEvt.pageX,
           y: downEvt.pageY
@@ -62,8 +62,8 @@
           // Корректируем координаты мыши
           mousePoint.clientX = mousePoint.clientX < ctx.elMap.offsetLeft ? ctx.elMap.offsetLeft : mousePoint.clientX;
           mousePoint.clientX = mousePoint.clientX > ctx.elMap.offsetLeft + ctx.elMap.clientWidth ? ctx.elMap.offsetLeft + ctx.elMap.clientWidth : mousePoint.clientX;
-          mousePoint.clientY = mousePoint.clientY < getPinMainX(window.consts.Y_START) - PIN_MAIN_HEIGHT ? getPinMainX(window.consts.Y_START) - PIN_MAIN_HEIGHT : mousePoint.clientY;
-          mousePoint.clientY = mousePoint.clientY > getPinMainX(window.consts.Y_END) - PIN_MAIN_HEIGHT ? getPinMainX(window.consts.Y_END) - PIN_MAIN_HEIGHT : mousePoint.clientY;
+          mousePoint.clientY = mousePoint.clientY < getX(window.consts.Y_START) - HEIGHT ? getX(window.consts.Y_START) - HEIGHT : mousePoint.clientY;
+          mousePoint.clientY = mousePoint.clientY > getX(window.consts.Y_END) - HEIGHT ? getX(window.consts.Y_END) - HEIGHT : mousePoint.clientY;
 
           // Определяем сдвиг курсора
           var shift = {
@@ -83,15 +83,15 @@
 
           // Определяем координаты острого конца
           var pinPos = {
-            x: getPinMainX(newLeft),
-            y: getPinMainY(newTop)
+            x: getX(newLeft),
+            y: getY(newTop)
           };
 
           // Корректируем положение элемента отностельного острого конца
-          newLeft = pinPos.x < 0 ? getPinMainLeft(0) : newLeft;
-          newLeft = pinPos.x > ctx.elMap.clientWidth ? getPinMainLeft(ctx.elMap.clientWidth) : newLeft;
-          newTop = pinPos.y < window.consts.Y_START ? getPinMainTop(window.consts.Y_START) : newTop;
-          newTop = pinPos.y > window.consts.Y_END ? getPinMainTop(window.consts.Y_END) : newTop;
+          newLeft = pinPos.x < 0 ? getLeft(0) : newLeft;
+          newLeft = pinPos.x > ctx.elMap.clientWidth ? getLeft(ctx.elMap.clientWidth) : newLeft;
+          newTop = pinPos.y < window.consts.Y_START ? getTop(window.consts.Y_START) : newTop;
+          newTop = pinPos.y > window.consts.Y_END ? getTop(window.consts.Y_END) : newTop;
 
           // Перемещаем элемент на новую позицию
           ctx.elPinMain.style.left = newLeft + 'px';
@@ -109,7 +109,7 @@
         document.addEventListener('mouseup', onMouseUp);
       };
 
-      ctx.elPinMain.addEventListener('mousedown', onPinMainMouseDown);
+      ctx.elPinMain.addEventListener('mousedown', onMouseDown);
       this.initOnceMouseDown();
     }
   };

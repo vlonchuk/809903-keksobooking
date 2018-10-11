@@ -1,11 +1,13 @@
 'use strict';
 
 (function () {
-  var SELECTED_PIN_CLASS = 'map__pin--active';
+  var SELECTED_CLASS = 'map__pin--active';
 
   var ctx; // Ссылка на контекст с глобальными переменными
+  var elOrg; // Ссылка на шаблон метки
+  var list = []; // Список меток
 
-  var addPin = function (accommodation, el) {
+  var addOne = function (accommodation, el) {
     el.style.left = accommodation.location.x + 'px';
     el.style.top = accommodation.location.y + 'px';
     var img = el.querySelector('img');
@@ -16,65 +18,62 @@
     return el;
   };
 
-  var elSelectedPin;
+  var elSelected;
 
-  var deselectPin = function () {
-    if (elSelectedPin) {
-      elSelectedPin.classList.remove(SELECTED_PIN_CLASS);
-      elSelectedPin = undefined;
+  var deselect = function () {
+    if (elSelected) {
+      elSelected.classList.remove(SELECTED_CLASS);
+      elSelected = undefined;
     }
   };
 
-  var selectPin = function (pin) {
-    deselectPin();
-    elSelectedPin = pin;
-    elSelectedPin.classList.add(SELECTED_PIN_CLASS);
+  var select = function (el) {
+    deselect();
+    elSelected = el;
+    elSelected.classList.add(SELECTED_CLASS);
   };
 
-  var correctPinsPos = function () {
-    var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    pins.forEach(function (pin) {
-      pin.style.Left = pin.offsetLeft - Math.round(pin.clientWidth / 2) + 'px';
-      pin.style.Top = pin.offsetTop + pin.clientHeight + 'px';
+  var correctPos = function () {
+    list.forEach(function (el) {
+      el.style.Left = el.offsetLeft - Math.round(el.clientWidth / 2) + 'px';
+      el.style.Top = el.offsetTop + el.clientHeight + 'px';
     });
   };
 
-  var onDeselectPin = function (evt) {
-    deselectPin();
-    ctx.elMap.removeChild(evt.target.parentElement);
-  };
+  var addAll = function (accommodations) {
+    if (!elOrg) {
+      var templ = document.querySelector('#pin');
+      elOrg = templ.content.querySelector('.map__pin');
+    }
 
-  var addPins = function (accommodations) {
-    var templPin = document.querySelector('#pin');
-    var elOrgPin = templPin.content.querySelector('.map__pin');
-    var fragmentPins = document.createDocumentFragment();
+    var fragment = document.createDocumentFragment();
     accommodations.forEach(function (accommodation) {
-      var elNewPin = elOrgPin.cloneNode(true);
-      elNewPin.addEventListener('click', function () {
-        window.card.addPinCard(ctx, accommodation, onDeselectPin);
-        selectPin(elNewPin);
+      var elNew = elOrg.cloneNode(true);
+      elNew.addEventListener('click', function () {
+        window.card.add(ctx, accommodation, deselect);
+        select(elNew);
       });
-      fragmentPins.appendChild(addPin(accommodation, elNewPin));
+      fragment.appendChild(addOne(accommodation, elNew));
+      list.push(elNew);
     });
-    window.api.addElement(fragmentPins, '.map__pins');
+    ctx.elMapPins.appendChild(fragment);
   };
 
   window.pin = {
-    makeNewPins: function (ctxRef, accommodations) {
+    makeNew: function (ctxRef, accommodations) {
       ctx = ctxRef;
       ctx.elMap.classList.remove('map--faded');
       // Добавляем метки
-      addPins(accommodations);
-      // Корректируем положение меток относительно их размеров
-      correctPinsPos();
+      addAll(accommodations);
+      // Корректируем их положение относительно их размеров
+      correctPos();
     },
 
-    removePins: function () {
-      var elMapPins = ctx.elMap.querySelector('.map__pins');
-      var pinList = elMapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-      pinList.forEach(function (el) {
-        elMapPins.removeChild(el);
+    remove: function () {
+      list.forEach(function (el) {
+        ctx.elMapPins.removeChild(el);
       });
+      list = [];
     }
   };
 })();
